@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nature-green: #2d6a4f;
+  --color-nature-light-green: #40916c;
+  --color-nature-brown: #8b5a2b;
+  --color-nature-light-brown: #cd853f;
+  --color-nature-sand: #f4a460;
+}
+
+body {
+  background-color: #f9fafb;
+  color: #111827;
+}
