@@ -9,5 +9,5 @@ public interface ReservationService {
     List<ReservationDto> getMyReservations(String username);
     List<ReservationDto> getCampsiteReservations(Long campsiteId);
     ReservationDto updateReservationStatus(Long id, String status, String rejectionReason);
-    void deleteReservation(Long id);
+    void deleteReservation(Long id, String email, String role);
 }

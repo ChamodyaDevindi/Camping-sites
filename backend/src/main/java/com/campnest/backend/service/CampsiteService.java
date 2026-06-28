@@ -10,4 +10,5 @@ public interface CampsiteService {
     Campsite createCampsite(Campsite campsite, String email);
     Campsite updateCampsite(Long id, Campsite campsiteDetails, String email, String role);
     void deleteCampsite(Long id, String email, String role);
+    void registerBookingClick(Long id);
 }

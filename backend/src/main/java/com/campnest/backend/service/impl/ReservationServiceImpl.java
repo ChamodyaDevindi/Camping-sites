@@ -43,8 +43,6 @@ public class ReservationServiceImpl implements ReservationService {
             throw new RuntimeException("Check-out date must be after check-in date");
         }
 
-        BigDecimal totalPrice = campsite.getPricePerNight().multiply(new BigDecimal(nights));
-
         Integer people = request.getNumberOfPeople();
         if (people == null || people <= 0) {
             int ads = request.getAdults() != null ? request.getAdults() : 0;
@@ -53,6 +51,19 @@ public class ReservationServiceImpl implements ReservationService {
             if (people <= 0) {
                 people = 1; // default fallback
             }
+        }
+
+        BigDecimal totalPrice = campsite.getPricePerNight()
+                .multiply(new BigDecimal(nights))
+                .multiply(new BigDecimal(people));
+
+        if (campsite.getMaxGuests() != null && people > campsite.getMaxGuests()) {
+            throw new RuntimeException("Number of guests exceeds campsite capacity of " + campsite.getMaxGuests() + ".");
+        }
+
+        Integer requestedTents = request.getNumberOfTents() != null ? request.getNumberOfTents() : 1;
+        if (campsite.getMaxTents() != null && requestedTents > campsite.getMaxTents()) {
+            throw new RuntimeException("Number of tents exceeds campsite capacity of " + campsite.getMaxTents() + ".");
         }
 
         Reservation reservation = Reservation.builder()
@@ -159,9 +170,19 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteReservation(Long id) {
+    public void deleteReservation(Long id, String email, String role) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
+        
+        if (role != null && role.contains("ROLE_CUSTOMER")) {
+            if (reservation.getUser() == null || !reservation.getUser().getEmail().equals(email)) {
+                throw new RuntimeException("You do not have permission to cancel this reservation.");
+            }
+            if (!"PENDING".equals(reservation.getStatus())) {
+                throw new RuntimeException("You cannot cancel this reservation after it has been approved or rejected.");
+            }
+        }
+        
         reservationRepository.delete(reservation);
     }
 
