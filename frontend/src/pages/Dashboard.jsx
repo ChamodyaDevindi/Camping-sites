@@ -115,7 +115,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-[var(--color-nature-green)]">{camp.name}</h3>
-                    <p className="text-sm text-gray-500">{camp.location} • LKR {camp.pricePerNight}/night</p>
+                    <p className="text-sm text-gray-500">{camp.location} • LKR {camp.pricePerNight}/person/night</p>
                   </div>
                   <div className="flex gap-4">
                     <button onClick={() => handleFetchBookings(camp.id)} className="text-[var(--color-nature-brown)] hover:text-[var(--color-nature-light-brown)] font-medium text-sm">

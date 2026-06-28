@@ -26,6 +26,18 @@ export default function MyBookings() {
       });
   }, [user, navigate]);
 
+  const handleCancelBooking = async (id) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      try {
+        await ReservationService.deleteReservation(id);
+        setBookings(bookings.filter(b => b.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert(err.response?.data?.message || 'Failed to cancel reservation.');
+      }
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Bookings</h1>
@@ -77,6 +89,14 @@ export default function MyBookings() {
                   </span>
                 </div>
                 <p className="text-xs text-gray-400 mt-2">Booked on {new Date(booking.bookingDate).toLocaleDateString()}</p>
+                {booking.status === 'PENDING' && (
+                  <button 
+                    onClick={() => handleCancelBooking(booking.id)}
+                    className="mt-3 px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer"
+                  >
+                    Cancel Booking
+                  </button>
+                )}
               </div>
             </div>
           ))}

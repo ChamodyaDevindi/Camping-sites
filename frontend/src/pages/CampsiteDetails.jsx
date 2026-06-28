@@ -46,14 +46,15 @@ export default function CampsiteDetails() {
       const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
       
       if (nights > 0) {
-        setTotalPrice(nights * camp.pricePerNight);
+        const peopleCount = parseInt(numberOfPeople) || 1;
+        setTotalPrice(nights * camp.pricePerNight * peopleCount);
         setBookingError('');
       } else {
         setTotalPrice(0);
         setBookingError('Check-out date must be after Check-in date.');
       }
     }
-  }, [checkInDate, checkOutDate, camp]);
+  }, [checkInDate, checkOutDate, camp, numberOfPeople]);
 
   const handleBooking = async (e) => {
     e.preventDefault();
@@ -90,8 +91,8 @@ export default function CampsiteDetails() {
   if (loading) return <div className="text-center py-20">Loading details...</div>;
   if (!camp) return <div className="text-center py-20">Campsite not found.</div>;
 
-  const phoneMatch = camp.description?.match(/Phone:\s*([\d\s]+)/);
-  const phone = phoneMatch ? phoneMatch[1].trim() : "N/A";
+  const phoneMatch = camp.description?.match(/Phone:\s*([\d\s+-]+)/i);
+  const phone = camp.owner?.phoneNumber || (phoneMatch ? phoneMatch[1].trim() : "N/A");
   
   const featuresMatch = camp.description?.match(/Features:\s*(.+)/i);
   const features = featuresMatch ? featuresMatch[1].trim() : "Basic camping facilities";
@@ -293,7 +294,7 @@ export default function CampsiteDetails() {
           <div>
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 sticky top-24 shadow-sm">
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                LKR {camp.pricePerNight} <span className="text-base font-normal text-gray-500">/ night</span>
+                LKR {camp.pricePerNight} <span className="text-base font-normal text-gray-500">/ person / night</span>
               </div>
               
               <div className="mb-6"></div>
