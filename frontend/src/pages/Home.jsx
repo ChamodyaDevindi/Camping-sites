@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CampsiteService from '../services/campsite.service';
 
 export default function Home() {
+  const navigate = useNavigate();
   const [featuredCampsites, setFeaturedCampsites] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   
   useEffect(() => {
     CampsiteService.getAllCampsites().then(res => {
@@ -23,6 +25,15 @@ export default function Home() {
       setFeaturedCampsites([]);
     });
   }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim() !== '') {
+      navigate(`/campsites?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/campsites');
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -46,18 +57,20 @@ export default function Home() {
             Discover and book the most breathtaking campsites and adventures across the country.
           </p>
           
-          {/* Search Bar Placeholder */}
-          <div className="bg-white p-2 rounded-full shadow-2xl flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="bg-white p-2 rounded-full shadow-2xl flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
             <input 
               type="text" 
               placeholder="Where do you want to go?" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 px-6 py-4 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--color-nature-green)]"
             />
-            <button className="bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white px-8 py-4 rounded-full font-bold transition-all hover:shadow-lg flex items-center justify-center gap-2">
+            <button type="submit" className="bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white px-8 py-4 rounded-full font-bold transition-all hover:shadow-lg flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               Search
             </button>
-          </div>
+          </form>
         </div>
       </div>
 

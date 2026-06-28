@@ -379,6 +379,9 @@ export default function CampsiteDetails() {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Estimated Base Price</span>
               <span className="text-3xl font-extrabold text-gray-900">LKR {camp.pricePerNight}</span>
               <span className="text-gray-500 font-semibold text-sm"> / person / night</span>
+              <p className="text-[10px] text-gray-400 font-medium italic mt-2">
+                *Final pricing may vary depending on the owner's packages and seasonal rates.
+              </p>
             </div>
             
             <hr className="border-gray-100" />
@@ -388,37 +391,43 @@ export default function CampsiteDetails() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">Phone:</span>
-                  <span className="text-gray-900 font-bold">{phone}</span>
+                  <a href={`tel:${cleanNumber(phone)}`} className="text-gray-900 font-bold hover:underline hover:text-[var(--color-nature-green)] transition-colors flex items-center gap-1">
+                    📞 {phone}
+                  </a>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">WhatsApp:</span>
-                  <span className="text-gray-900 font-bold">{whatsapp}</span>
+                  <a href={`https://wa.me/${cleanNumber(whatsapp)}`} target="_blank" rel="noopener noreferrer" className="text-gray-900 font-bold hover:underline hover:text-[var(--color-nature-green)] transition-colors flex items-center gap-1">
+                    💬 {whatsapp}
+                  </a>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">Email:</span>
-                  <span className="text-gray-900 font-bold truncate max-w-[170px]" title={email}>{email}</span>
+                  <a href={`mailto:${email}`} className="text-gray-900 font-bold hover:underline hover:text-[var(--color-nature-green)] transition-colors truncate max-w-[170px]" title={email}>
+                    ✉️ {email}
+                  </a>
                 </div>
                 {camp.websiteUrl && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-semibold">Website:</span>
-                    <a href={formatUrl(camp.websiteUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
-                      {camp.websiteUrl.replace(/https?:\/\/(www\.)?/, '')}
+                    <a href={formatUrl(camp.websiteUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px] flex items-center gap-1">
+                      🌐 Official Website
                     </a>
                   </div>
                 )}
                 {camp.facebookUrl && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-semibold">Facebook:</span>
-                    <a href={formatUrl(camp.facebookUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
-                      Facebook Page
+                    <a href={formatUrl(camp.facebookUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px] flex items-center gap-1">
+                      🔗 Facebook Page
                     </a>
                   </div>
                 )}
                 {camp.instagramUrl && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-semibold">Instagram:</span>
-                    <a href={formatUrl(camp.instagramUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
-                      Instagram Profile
+                    <a href={formatUrl(camp.instagramUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px] flex items-center gap-1">
+                      📸 Instagram Profile
                     </a>
                   </div>
                 )}
@@ -428,30 +437,49 @@ export default function CampsiteDetails() {
             <hr className="border-gray-100" />
 
             {camp.externalBooking && bookingUrl ? (
-              <a 
-                href={formatUrl(bookingUrl)} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                onClick={handleBookingClick}
-                className="w-full inline-block text-center bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white font-bold py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md cursor-pointer text-sm"
-              >
-                Book on Official Website
-              </a>
-            ) : (
               <div className="space-y-3">
                 <a 
-                  href={`tel:${cleanNumber(phone)}`}
-                  className="w-full inline-block text-center bg-[var(--color-nature-brown)] hover:bg-[var(--color-nature-light-brown)] text-white font-bold py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm"
+                  href={formatUrl(bookingUrl)} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  onClick={handleBookingClick}
+                  className="w-full inline-block text-center bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white font-bold py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md cursor-pointer text-sm animate-pulse"
                 >
-                  Call Owner
+                  Book on Official Website
                 </a>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <a 
+                    href={`https://wa.me/${cleanNumber(whatsapp)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-center bg-[#25D366] hover:bg-[#20ba56] text-white font-bold py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm text-xs flex items-center justify-center gap-1"
+                  >
+                    💬 WhatsApp
+                  </a>
+                  <a 
+                    href={`tel:${cleanNumber(phone)}`}
+                    className="text-center bg-[var(--color-nature-brown)] hover:bg-[var(--color-nature-light-brown)] text-white font-bold py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm text-xs flex items-center justify-center gap-1"
+                  >
+                    📞 Call Owner
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
                 <a 
                   href={`https://wa.me/${cleanNumber(whatsapp)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-block text-center bg-[#25D366] hover:bg-[#20ba56] text-white font-bold py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm"
+                  className="w-full inline-block text-center bg-[#25D366] hover:bg-[#20ba56] text-white font-bold py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm"
                 >
-                  WhatsApp Owner
+                  💬 WhatsApp Owner
+                </a>
+                <a 
+                  href={`tel:${cleanNumber(phone)}`}
+                  className="w-full inline-block text-center bg-[var(--color-nature-brown)] hover:bg-[var(--color-nature-light-brown)] text-white font-bold py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm"
+                >
+                  📞 Call Owner
                 </a>
               </div>
             )}

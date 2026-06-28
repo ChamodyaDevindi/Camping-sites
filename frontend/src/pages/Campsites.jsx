@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CampsiteService from '../services/campsite.service';
 
 export default function Campsites() {
+  const location = useLocation();
   const [campsites, setCampsites] = useState([]);
   const [filteredCampsites, setFilteredCampsites] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +54,17 @@ export default function Campsites() {
       });
     }
   }, []);
+
+  // Sync Search term with URL parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('search');
+    if (query) {
+      setSearchTerm(decodeURIComponent(query));
+    } else {
+      setSearchTerm('');
+    }
+  }, [location.search]);
 
   // Filter Logic
   useEffect(() => {

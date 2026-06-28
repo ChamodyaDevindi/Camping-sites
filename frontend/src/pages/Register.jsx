@@ -47,7 +47,7 @@ export default function Register() {
             Join CampNest
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Create an account to start booking campsites
+            Create an account to discover camping spots and share reviews
           </p>
         </div>
         
@@ -65,8 +65,8 @@ export default function Register() {
                 <label className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${formData.role === 'customer' ? 'border-[var(--color-nature-green)] bg-green-50 text-green-800' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
                   <input type="radio" name="role" value="customer" checked={formData.role === 'customer'} onChange={handleChange} className="sr-only" />
                   <span className="text-2xl mb-2 block">🏕️</span>
-                  <span className="block font-medium">Book Campsites</span>
-                  <span className="text-xs mt-1 block opacity-80">I am a customer</span>
+                  <span className="block font-medium">Explore Campsites</span>
+                  <span className="text-xs mt-1 block opacity-80">I am a traveler</span>
                 </label>
                 
                 <label className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${formData.role === 'owner' ? 'border-[var(--color-nature-brown)] bg-orange-50 text-orange-800' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
