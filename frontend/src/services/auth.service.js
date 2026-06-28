@@ -32,11 +32,20 @@ const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
 
+const getUserProfile = () => {
+  const user = getCurrentUser();
+  const token = user ? user.token : "";
+  return axios.get(API_URL + "profile", {
+    headers: { Authorization: "Bearer " + token }
+  });
+};
+
 const AuthService = {
   register,
   login,
   logout,
   getCurrentUser,
+  getUserProfile,
 };
 
 export default AuthService;

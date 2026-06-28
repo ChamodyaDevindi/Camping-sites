@@ -45,6 +45,10 @@ const uploadImage = (file) => {
   });
 };
 
+const registerClick = (id) => {
+  return axios.post(API_URL + `/${id}/click`);
+};
+
 const CampsiteService = {
   getAllCampsites,
   getMyCampsites,
@@ -53,6 +57,7 @@ const CampsiteService = {
   updateCampsite,
   deleteCampsite,
   uploadImage,
+  registerClick,
 };
 
 export default CampsiteService;

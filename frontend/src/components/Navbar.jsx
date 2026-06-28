@@ -33,8 +33,8 @@ export default function Navbar() {
               <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
                 <span className="text-sm font-medium text-gray-600">Hi, {user.email}</span>
                 {user?.role === 'ROLE_CUSTOMER' && (
-                  <Link to="/my-bookings" className="text-sm font-medium text-[var(--color-nature-green)] hover:text-[var(--color-nature-light-green)] transition-colors">
-                    My Bookings
+                  <Link to="/customer-dashboard" className="text-sm font-medium text-[var(--color-nature-green)] hover:text-[var(--color-nature-light-green)] transition-colors">
+                    Dashboard
                   </Link>
                 )}
                 {user?.role === 'ROLE_OWNER' && (

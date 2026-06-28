@@ -10,8 +10,8 @@ import Dashboard from './pages/Dashboard';
 import AddCampsite from './pages/AddCampsite';
 import EditCampsite from './pages/EditCampsite';
 import CampsiteDetails from './pages/CampsiteDetails';
-import MyBookings from './pages/MyBookings';
 import AdminDashboard from './pages/AdminDashboard';
+import CustomerDashboard from './pages/CustomerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -51,9 +51,9 @@ function App() {
           } />
 
           {/* Customer Routes */}
-          <Route path="/my-bookings" element={
+          <Route path="/customer-dashboard" element={
             <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
-              <MyBookings />
+              <CustomerDashboard />
             </ProtectedRoute>
           } />
         </Routes>

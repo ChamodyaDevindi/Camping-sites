@@ -17,6 +17,17 @@ public class Campsite {
     private Long id;
 
     private String name;
+    private String bookingUrl;
+    private String contactNumber;
+    private String whatsappNumber;
+    private String email;
+    private boolean externalBooking;
+
+    @Builder.Default
+    private Long totalViews = 0L;
+
+    @Builder.Default
+    private Long bookingClicks = 0L;
     
     @Column(columnDefinition = "TEXT")
     private String description;

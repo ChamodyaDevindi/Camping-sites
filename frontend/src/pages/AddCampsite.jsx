@@ -27,7 +27,12 @@ export default function AddCampsite() {
     hikingStartingPoint: '',
     hikingDistance: '',
     hikingTime: '',
-    hikingDifficulty: 'Easy'
+    hikingDifficulty: 'Easy',
+    bookingUrl: '',
+    contactNumber: '',
+    whatsappNumber: '',
+    email: '',
+    externalBooking: false
   });
 
   const [priceDetails, setPriceDetails] = useState([
@@ -119,6 +124,32 @@ export default function AddCampsite() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Campsite Name</label>
               <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. Kalani river bank camping site" />
+            </div>
+            
+            <div className="flex items-center gap-2 py-2">
+              <input type="checkbox" id="externalBooking" name="externalBooking" checked={formData.externalBooking} onChange={(e) => setFormData({...formData, externalBooking: e.target.checked})} className="h-4 w-4 text-[var(--color-nature-green)] focus:ring-[var(--color-nature-green)] border-gray-300 rounded" />
+              <label htmlFor="externalBooking" className="text-sm font-medium text-gray-700">Enable External Website Booking (Official Link)</label>
+            </div>
+            {formData.externalBooking && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Official Booking Website Link (URL)</label>
+                <input type="text" name="bookingUrl" required={formData.externalBooking} value={formData.bookingUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. https://www.booking-site.com/campsite" />
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Phone Number</label>
+                <input type="text" name="contactNumber" required value={formData.contactNumber} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. 0771234567" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+                <input type="text" name="whatsappNumber" value={formData.whatsappNumber} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. 94771234567" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
+                <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. info@campsite.com" />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Overview / Description</label>
