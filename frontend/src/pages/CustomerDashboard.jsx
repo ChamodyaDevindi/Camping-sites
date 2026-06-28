@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import CampsiteService from '../services/campsite.service';
+import FavoriteService from '../services/favorite.service';
+import ReviewService from '../services/review.service';
 import AuthService from '../services/auth.service';
 
 export default function CustomerDashboard() {
@@ -13,6 +14,35 @@ export default function CustomerDashboard() {
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [favCampsites, setFavCampsites] = useState([]);
   const [loadingFavs, setLoadingFavs] = useState(false);
+  
+  const [userReviews, setUserReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  const fetchFavorites = () => {
+    setLoadingFavs(true);
+    FavoriteService.getUserFavorites()
+      .then(res => {
+        setFavCampsites(res.data || []);
+        setLoadingFavs(false);
+      })
+      .catch(err => {
+        console.error("Error fetching database favorites", err);
+        setLoadingFavs(false);
+      });
+  };
+
+  const fetchUserReviews = () => {
+    setLoadingReviews(true);
+    ReviewService.getUserReviews()
+      .then(res => {
+        setUserReviews(res.data || []);
+        setLoadingReviews(false);
+      })
+      .catch(err => {
+        console.error("Error loading user reviews", err);
+        setLoadingReviews(false);
+      });
+  };
 
   useEffect(() => {
     if (!user) {
@@ -32,41 +62,19 @@ export default function CustomerDashboard() {
         setLoadingProfile(false);
       });
 
-    // Load Favorite Campsites
-    setLoadingFavs(true);
-    const favIds = JSON.parse(localStorage.getItem('favCampsites') || '[]');
-    if (favIds.length === 0) {
-      setFavCampsites([]);
-      setLoadingFavs(false);
-    } else {
-      CampsiteService.getAllCampsites()
-        .then(res => {
-          const list = Array.isArray(res.data) ? res.data : [];
-          const filtered = list.filter(c => favIds.includes(c.id));
-          setFavCampsites(filtered);
-          setLoadingFavs(false);
-        })
-        .catch(err => {
-          console.error("Error fetching campsites for favorites tab", err);
-          setLoadingFavs(false);
-        });
-    }
+    fetchFavorites();
+    fetchUserReviews();
   }, [user, navigate]);
 
   const removeFavorite = (id, e) => {
     e.preventDefault();
     e.stopPropagation();
-    const favIds = JSON.parse(localStorage.getItem('favCampsites') || '[]');
-    const newFavIds = favIds.filter(fid => fid !== id);
-    localStorage.setItem('favCampsites', JSON.stringify(newFavIds));
-    setFavCampsites(favCampsites.filter(c => c.id !== id));
+    FavoriteService.toggleFavorite(id)
+      .then(() => {
+        fetchFavorites();
+      })
+      .catch(err => console.error("Error toggling favorite from dashboard", err));
   };
-
-  // Mock Reviews
-  const mockUserReviews = [
-    { campsiteName: "Kitulgala Adventure Camp", rating: 5, date: "May 12, 2026", text: "Absolutely stunning place! The river view was breathtaking and the facilities were very clean. Highly recommended for weekend getaways!" },
-    { campsiteName: "Sinharaja Rainforest Camp", rating: 4, date: "June 03, 2026", text: "Great campsite with helpful guides. Hiking trails around the location are easy to moderate. WhatsApp communication with the owner was very fast." }
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
@@ -99,7 +107,7 @@ export default function CustomerDashboard() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            My Reviews ({mockUserReviews.length})
+            My Reviews ({userReviews.length})
           </button>
           
           <button 
@@ -175,22 +183,32 @@ export default function CustomerDashboard() {
         {/* Tab 2: My Reviews */}
         {activeTab === 'reviews' && (
           <div className="space-y-6">
-            {mockUserReviews.map((rev, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h4 className="font-bold text-gray-800 text-lg">{rev.campsiteName}</h4>
-                    <span className="text-xs text-gray-400">{rev.date}</span>
-                  </div>
-                  <div className="flex text-yellow-400 text-sm">
-                    {Array.from({ length: rev.rating }).map((_, idx) => (
-                      <span key={idx}>★</span>
-                    ))}
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm italic">"{rev.text}"</p>
+            {loadingReviews ? (
+              <div className="text-center py-10 text-gray-500 font-medium">Loading reviews...</div>
+            ) : userReviews.length === 0 ? (
+              <div className="text-center py-10 bg-white rounded-2xl border p-8 text-gray-400 font-medium">
+                You haven't written any reviews yet. Go to a campsite page to share your experience!
               </div>
-            ))}
+            ) : (
+              userReviews.map((rev) => (
+                <div key={rev.id} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-lg hover:underline hover:text-[var(--color-nature-green)]">
+                        <Link to={`/campsites/${rev.campsite?.id}`}>{rev.campsite?.name || 'Campsite'}</Link>
+                      </h4>
+                      <span className="text-xs text-gray-400">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex text-yellow-400 text-sm">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <span key={idx}>{idx < rev.rating ? '★' : '☆'}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-gray-600 text-sm italic">"{rev.comment}"</p>
+                </div>
+              ))
+            )}
           </div>
         )}
 

@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import CampsiteService from '../services/campsite.service';
+import FavoriteService from '../services/favorite.service';
+import ReviewService from '../services/review.service';
 import { useAuth } from '../context/AuthContext';
 
 export default function CampsiteDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   
   const [camp, setCamp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePhoto, setActivePhoto] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // Reviews states
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   // Redirection Link formatter
   const formatUrl = (url) => {
@@ -26,6 +37,19 @@ export default function CampsiteDetails() {
     return num.replace(/[+\s-]/g, "");
   };
 
+  const fetchReviews = () => {
+    setLoadingReviews(true);
+    ReviewService.getCampsiteReviews(id)
+      .then(res => {
+        setReviews(res.data || []);
+        setLoadingReviews(false);
+      })
+      .catch(err => {
+        console.error("Error loading reviews", err);
+        setLoadingReviews(false);
+      });
+  };
+
   useEffect(() => {
     CampsiteService.getCampsiteById(id)
       .then(res => {
@@ -33,17 +57,33 @@ export default function CampsiteDetails() {
         if (res.data.photos && res.data.photos.length > 0) {
           setActivePhoto(res.data.photos[0]);
         }
-        
-        // Check favorites from local storage
-        const favs = JSON.parse(localStorage.getItem('favCampsites') || '[]');
-        setIsFavorite(favs.includes(res.data.id));
         setLoading(false);
+
+        // Track Recently Viewed (LocalStorage)
+        let recently = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+        recently = recently.filter(cid => cid !== res.data.id);
+        recently.unshift(res.data.id);
+        recently = recently.slice(0, 10);
+        localStorage.setItem('recentlyViewed', JSON.stringify(recently));
       })
       .catch(err => {
         console.error("Error fetching campsite details", err);
         setLoading(false);
       });
-  }, [id]);
+
+    // Register view count count once on mount
+    CampsiteService.registerView(id)
+      .catch(err => console.error("Error registering metrics view", err));
+
+    // Get favorite status from backend DB
+    if (user) {
+      FavoriteService.getFavoriteStatus(id)
+        .then(res => setIsFavorite(res.data))
+        .catch(err => console.error("Error fetching favorites status", err));
+    }
+
+    fetchReviews();
+  }, [id, user]);
 
   const handleBookingClick = async () => {
     if (!camp) return;
@@ -55,17 +95,47 @@ export default function CampsiteDetails() {
   };
 
   const toggleFavorite = () => {
-    if (!camp) return;
-    const favs = JSON.parse(localStorage.getItem('favCampsites') || '[]');
-    let newFavs;
-    if (favs.includes(camp.id)) {
-      newFavs = favs.filter(fid => fid !== camp.id);
-      setIsFavorite(false);
-    } else {
-      newFavs = [...favs, camp.id];
-      setIsFavorite(true);
+    if (!user) {
+      navigate('/login');
+      return;
     }
-    localStorage.setItem('favCampsites', JSON.stringify(newFavs));
+    FavoriteService.toggleFavorite(camp.id)
+      .then(res => {
+        setIsFavorite(res.data);
+      })
+      .catch(err => {
+        console.error("Error toggling favorite on database", err);
+      });
+  };
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (!comment.trim()) {
+      setReviewError("Please write a comment.");
+      return;
+    }
+
+    setSubmittingReview(true);
+    setReviewError('');
+    
+    ReviewService.addReview(camp.id, { rating, comment })
+      .then(() => {
+        setComment('');
+        setRating(5);
+        setSubmittingReview(false);
+        fetchReviews();
+        // Reload campsite details to update average rating and count stats
+        CampsiteService.getCampsiteById(id).then(res => setCamp(res.data));
+      })
+      .catch(err => {
+        console.error(err);
+        setReviewError(err.response?.data?.message || 'Failed to submit review.');
+        setSubmittingReview(false);
+      });
   };
 
   if (loading) return <div className="text-center py-20 text-gray-500">Loading details...</div>;
@@ -76,29 +146,26 @@ export default function CampsiteDetails() {
   const email = camp.email || camp.owner?.email || "N/A";
   const bookingUrl = camp.bookingUrl || "";
 
-  // Mock Reviews
-  const mockReviews = [
-    { name: "Suresh Perera", rating: 5, date: "May 12, 2026", text: "Absolutely stunning place! The river view was breathtaking and the facilities were very clean. Highly recommended for weekend getaways!" },
-    { name: "Niluni Silva", rating: 4, date: "June 03, 2026", text: "Great campsite with helpful guides. Hiking trails around the location are easy to moderate. WhatsApp communication with the owner was very fast." },
-    { name: "David M.", rating: 5, date: "June 24, 2026", text: "One of the best camping spots in Sri Lanka. Smooth booking experience. Will definitely visit again next month!" }
-  ];
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
       <Link to="/campsites" className="text-[var(--color-nature-green)] hover:underline mb-6 inline-block font-semibold">
         &larr; Back to all campsites
       </Link>
       
-      {/* 1. Header Details (Camping Name & Rating stars & Favorite button) */}
+      {/* 1. Header Details */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8 p-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{camp.name}</h1>
             <div className="flex items-center gap-3 mt-2">
               <div className="flex text-yellow-400 text-lg">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i}>{i < Math.round(camp.averageRating || 0) ? '★' : '☆'}</span>
+                ))}
               </div>
-              <span className="text-sm font-semibold text-gray-500">(4.8 / 5.0 from {mockReviews.length} reviews)</span>
+              <span className="text-sm font-semibold text-gray-500">
+                ({camp.averageRating ? camp.averageRating.toFixed(1) : '0.0'} / 5.0 from {camp.reviewCount || 0} reviews)
+              </span>
             </div>
             <p className="text-gray-600 mt-2 flex items-center gap-2 font-medium">
               <svg className="w-5 h-5 text-[var(--color-nature-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -159,7 +226,7 @@ export default function CampsiteDetails() {
           <section className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 font-display">About the Campsite</h2>
             <div className="prose text-gray-600 leading-relaxed">
-              <p className="whitespace-pre-line">{camp.description ? camp.description.replace(/Rating:.*|Phone:.*|Features:.*/gi, '') : ''}</p>
+              <p className="whitespace-pre-line">{camp.description}</p>
             </div>
           </section>
 
@@ -224,27 +291,83 @@ export default function CampsiteDetails() {
             </section>
           )}
 
-          {/* 6. Reviews & Ratings Section */}
+          {/* 6. Database Reviews & Ratings Section */}
           <section className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">User Reviews</h2>
-            <div className="space-y-6">
-              {mockReviews.map((review, i) => (
-                <div key={i} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-bold text-gray-800">{review.name}</h4>
-                      <span className="text-xs text-gray-400">{review.date}</span>
-                    </div>
-                    <div className="flex text-yellow-400 text-sm">
-                      {Array.from({ length: review.rating }).map((_, idx) => (
-                        <span key={idx}>★</span>
-                      ))}
-                    </div>
+            
+            {/* Real review submissions */}
+            {user && user.role === 'ROLE_CUSTOMER' ? (
+              <form onSubmit={handleAddReview} className="mb-8 bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
+                <h3 className="font-bold text-gray-800 text-sm">Write a Review</h3>
+                {reviewError && <p className="text-xs text-red-500 font-semibold">{reviewError}</p>}
+                
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Rating</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((starVal) => (
+                      <button 
+                        key={starVal} 
+                        type="button" 
+                        onClick={() => setRating(starVal)}
+                        className={`text-2xl transition-transform active:scale-95 ${rating >= starVal ? 'text-yellow-400' : 'text-gray-300'}`}
+                      >
+                        ★
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-gray-600 text-sm italic">"{review.text}"</p>
                 </div>
-              ))}
-            </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Comment</label>
+                  <textarea 
+                    rows="3" 
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" 
+                    placeholder="Describe your camping experience here..."
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={submittingReview}
+                  className="bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white px-5 py-2.5 rounded-lg text-xs font-bold shadow transition-all disabled:opacity-50"
+                >
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </form>
+            ) : !user ? (
+              <div className="mb-8 p-4 bg-orange-50 border border-orange-100 text-orange-800 text-sm font-semibold text-center rounded-xl">
+                Please <Link to="/login" className="underline">sign in as customer</Link> to write a review.
+              </div>
+            ) : null}
+
+            {/* List Reviews */}
+            {loadingReviews ? (
+              <div className="text-gray-400 font-medium text-sm">Loading reviews...</div>
+            ) : reviews.length === 0 ? (
+              <div className="text-gray-400 text-sm italic">No reviews written for this campsite yet. Be the first to share your experience!</div>
+            ) : (
+              <div className="space-y-6">
+                {reviews.map((rev) => (
+                  <div key={rev.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-bold text-gray-800">{rev.user?.firstName || 'Campsite Explorer'} {rev.user?.lastName || ''}</h4>
+                        <span className="text-xs text-gray-400">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex text-yellow-400 text-sm">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <span key={idx}>{idx < rev.rating ? '★' : '☆'}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 text-sm italic">"{rev.comment}"</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
         </div>
@@ -273,13 +396,29 @@ export default function CampsiteDetails() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">Email:</span>
-                  <span className="text-gray-900 font-bold">{email}</span>
+                  <span className="text-gray-900 font-bold truncate max-w-[170px]" title={email}>{email}</span>
                 </div>
-                {bookingUrl && (
+                {camp.websiteUrl && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">Official Web:</span>
-                    <a href={formatUrl(bookingUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
-                      {bookingUrl.replace(/https?:\/\/(www\.)?/, '')}
+                    <span className="text-gray-500 font-semibold">Website:</span>
+                    <a href={formatUrl(camp.websiteUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
+                      {camp.websiteUrl.replace(/https?:\/\/(www\.)?/, '')}
+                    </a>
+                  </div>
+                )}
+                {camp.facebookUrl && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">Facebook:</span>
+                    <a href={formatUrl(camp.facebookUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
+                      Facebook Page
+                    </a>
+                  </div>
+                )}
+                {camp.instagramUrl && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">Instagram:</span>
+                    <a href={formatUrl(camp.instagramUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px]">
+                      Instagram Profile
                     </a>
                   </div>
                 )}

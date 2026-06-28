@@ -32,7 +32,10 @@ export default function AddCampsite() {
     contactNumber: '',
     whatsappNumber: '',
     email: '',
-    externalBooking: false
+    externalBooking: false,
+    facebookUrl: '',
+    instagramUrl: '',
+    websiteUrl: ''
   });
 
   const [priceDetails, setPriceDetails] = useState([
@@ -149,6 +152,21 @@ export default function AddCampsite() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
                 <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. info@campsite.com" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Facebook Page Link (Optional)</label>
+                <input type="text" name="facebookUrl" value={formData.facebookUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. facebook.com/campsite" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Instagram Link (Optional)</label>
+                <input type="text" name="instagramUrl" value={formData.instagramUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. instagram.com/campsite" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Official Website Link (Optional)</label>
+                <input type="text" name="websiteUrl" value={formData.websiteUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="e.g. www.campsite.com" />
               </div>
             </div>
             <div>

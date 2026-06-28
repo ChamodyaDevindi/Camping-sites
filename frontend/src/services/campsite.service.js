@@ -49,6 +49,10 @@ const registerClick = (id) => {
   return axios.post(API_URL + `/${id}/click`);
 };
 
+const registerView = (id) => {
+  return axios.post(API_URL + `/${id}/view`);
+};
+
 const CampsiteService = {
   getAllCampsites,
   getMyCampsites,
@@ -58,6 +62,7 @@ const CampsiteService = {
   deleteCampsite,
   uploadImage,
   registerClick,
+  registerView,
 };
 
 export default CampsiteService;
