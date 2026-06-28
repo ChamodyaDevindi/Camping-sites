@@ -7,9 +7,14 @@ export default function Home() {
   
   useEffect(() => {
     CampsiteService.getAllCampsites().then(res => {
-      // Get only the first 3 campsites for the homepage
       if (Array.isArray(res.data)) {
-        setFeaturedCampsites(res.data.slice(0, 3));
+        const sorted = [...res.data].sort((a, b) => {
+          if ((b.averageRating || 0) !== (a.averageRating || 0)) {
+            return (b.averageRating || 0) - (a.averageRating || 0);
+          }
+          return (b.reviewCount || 0) - (a.reviewCount || 0);
+        });
+        setFeaturedCampsites(sorted.slice(0, 3));
       } else {
         setFeaturedCampsites([]);
       }
@@ -18,6 +23,7 @@ export default function Home() {
       setFeaturedCampsites([]);
     });
   }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -85,6 +91,13 @@ export default function Home() {
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{camp.name}</h3>
+                {camp.averageRating > 0 && (
+                  <div className="flex items-center gap-1 mb-2">
+                    <span className="text-yellow-400 text-sm">★</span>
+                    <span className="text-xs font-bold text-gray-700">{camp.averageRating.toFixed(1)}</span>
+                    <span className="text-xs text-gray-400 font-semibold">({camp.reviewCount} reviews)</span>
+                  </div>
+                )}
                 <p className="text-gray-500 text-sm mb-6">{camp.location}</p>
                 <div className="mt-auto">
                   <Link to={`/campsites/${camp.id}`} className="w-full inline-block text-center bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white font-medium py-2 rounded-lg transition-colors shadow-sm">

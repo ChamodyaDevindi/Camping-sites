@@ -285,8 +285,8 @@ export default function Campsites() {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100 text-sm">No Image</div>
                     )}
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[var(--color-nature-green)] shadow-sm">
-                      LKR {camp.pricePerNight}/person/night
+                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-full text-[11px] font-extrabold text-[var(--color-nature-green)] shadow-sm">
+                      LKR {camp.pricePerNight} p.n.
                     </div>
                   </Link>
                   
