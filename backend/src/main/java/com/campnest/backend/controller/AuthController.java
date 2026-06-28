@@ -47,10 +47,15 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();    
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Error: User not found."));
+
         return ResponseEntity.ok(new JwtResponse(jwt, 
                                                  userDetails.getId(), 
                                                  userDetails.getUsername(), 
-                                                 role));
+                                                 role,
+                                                 user.getFirstName(),
+                                                 user.getLastName()));
     }
 
     @PostMapping("/signup")
