@@ -8,6 +8,7 @@ import com.campnest.backend.repository.UserRepository;
 import com.campnest.backend.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -107,6 +108,7 @@ public class CampsiteServiceImpl implements CampsiteService {
     }
 
     @Override
+    @Transactional
     public void deleteCampsite(Long id, String email, String role) {
         Campsite campsite = getCampsiteById(id);
         
@@ -114,6 +116,12 @@ public class CampsiteServiceImpl implements CampsiteService {
             if (campsite.getOwner() == null || !campsite.getOwner().getEmail().equals(email)) {
                 throw new RuntimeException("You do not have permission to delete this campsite.");
             }
+        }
+        
+        // Delete all reservations associated with this campsite to avoid foreign key constraint violations
+        List<Reservation> reservations = reservationRepository.findByCampsiteId(id);
+        if (reservations != null && !reservations.isEmpty()) {
+            reservationRepository.deleteAll(reservations);
         }
         
         campsiteRepository.delete(campsite);
