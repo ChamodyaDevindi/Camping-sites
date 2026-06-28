@@ -23,6 +23,16 @@ public class Campsite {
     private String email;
     private boolean externalBooking;
 
+    private String facebookUrl;
+    private String instagramUrl;
+    private String websiteUrl;
+
+    @Builder.Default
+    private Double averageRating = 0.0;
+
+    @Builder.Default
+    private Integer reviewCount = 0;
+
     @Builder.Default
     private Long totalViews = 0L;
 

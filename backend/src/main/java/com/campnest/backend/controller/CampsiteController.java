@@ -76,4 +76,10 @@ public class CampsiteController {
         campsiteService.registerBookingClick(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<?> registerView(@PathVariable Long id) {
+        campsiteService.registerView(id);
+        return ResponseEntity.ok().build();
+    }
 }

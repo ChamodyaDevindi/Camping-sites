@@ -51,10 +51,6 @@ public class CampsiteServiceImpl implements CampsiteService {
             throw new RuntimeException("Campsite not found with id " + id);
         }
         populateBookedStatus(campsite);
-        
-        campsite.setTotalViews(campsite.getTotalViews() == null ? 1L : campsite.getTotalViews() + 1);
-        campsiteRepository.save(campsite);
-        
         return campsite;
     }
 
@@ -89,6 +85,9 @@ public class CampsiteServiceImpl implements CampsiteService {
         campsite.setWhatsappNumber(campsiteDetails.getWhatsappNumber());
         campsite.setEmail(campsiteDetails.getEmail());
         campsite.setExternalBooking(campsiteDetails.isExternalBooking());
+        campsite.setFacebookUrl(campsiteDetails.getFacebookUrl());
+        campsite.setInstagramUrl(campsiteDetails.getInstagramUrl());
+        campsite.setWebsiteUrl(campsiteDetails.getWebsiteUrl());
         campsite.setDescription(campsiteDetails.getDescription());
         campsite.setPricePerNight(campsiteDetails.getPricePerNight());
         campsite.setMaxGuests(campsiteDetails.getMaxGuests());
@@ -142,6 +141,15 @@ public class CampsiteServiceImpl implements CampsiteService {
         Campsite campsite = campsiteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Campsite not found"));
         campsite.setBookingClicks(campsite.getBookingClicks() == null ? 1L : campsite.getBookingClicks() + 1);
+        campsiteRepository.save(campsite);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void registerView(Long id) {
+        Campsite campsite = campsiteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Campsite not found"));
+        campsite.setTotalViews(campsite.getTotalViews() == null ? 1L : campsite.getTotalViews() + 1);
         campsiteRepository.save(campsite);
     }
 }
