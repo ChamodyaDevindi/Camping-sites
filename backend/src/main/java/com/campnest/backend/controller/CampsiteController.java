@@ -70,4 +70,10 @@ public class CampsiteController {
         campsiteService.deleteCampsite(id, authentication.getName(), role);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{id}/click")
+    public ResponseEntity<?> registerBookingClick(@PathVariable Long id) {
+        campsiteService.registerBookingClick(id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -86,6 +86,16 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(new MessageResponse("Unauthorized"));
+        }
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/reset-admin")
     public ResponseEntity<?> resetAdmin() {
         User admin = userRepository.findByEmail("admin@campnest.com").orElse(null);
