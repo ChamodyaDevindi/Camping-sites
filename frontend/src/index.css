@@ -6,6 +6,16 @@
   --color-nature-brown: #8b5a2b;
   --color-nature-light-brown: #cd853f;
   --color-nature-sand: #f4a460;
+  
+  /* Trailhead Footer Theme */
+  --color-trail-bg: #122019;
+  --color-trail-ember: #E2793F;
+  --color-trail-moss: #93A88C;
+  --color-trail-parchment: #F3ECDD;
+  
+  --font-trail-serif: "Fraunces", Georgia, serif;
+  --font-trail-sans: "Work Sans", sans-serif;
+  --font-trail-mono: "IBM Plex Mono", monospace;
 }
 
 body {
