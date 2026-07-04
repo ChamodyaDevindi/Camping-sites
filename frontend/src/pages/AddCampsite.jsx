@@ -38,12 +38,7 @@ export default function AddCampsite() {
     websiteUrl: ''
   });
 
-  const [priceDetails, setPriceDetails] = useState([
-    { label: 'Day Visit', price: 'LKR 1,000 – 2,000' },
-    { label: 'Camping Only', price: 'LKR 2,500 – 4,500 per person' },
-    { label: 'Camping + Meals', price: 'LKR 5,000 – 7,500 per person' },
-    { label: 'Adventure Package', price: 'LKR 8,000 – 15,000 per person' }
-  ]);
+  const [priceDetails, setPriceDetails] = useState([]);
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
