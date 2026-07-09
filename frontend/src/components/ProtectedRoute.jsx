@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     // If user is logged in but doesn't have the right role
     if (user.role === 'ROLE_ADMIN') return <Navigate to="/admin" replace />;
     if (user.role === 'ROLE_OWNER') return <Navigate to="/dashboard" replace />;
-    if (user.role === 'ROLE_CUSTOMER') return <Navigate to="/my-bookings" replace />;
+    if (user.role === 'ROLE_CUSTOMER') return <Navigate to="/customer-dashboard" replace />;
     
     // Fallback if role is undefined or invalid (e.g. old logged in user)
     return <Navigate to="/" replace />;
