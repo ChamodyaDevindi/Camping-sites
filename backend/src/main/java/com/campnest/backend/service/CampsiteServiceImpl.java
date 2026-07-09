@@ -2,10 +2,8 @@ package com.campnest.backend.service;
 
 import com.campnest.backend.entity.Campsite;
 import com.campnest.backend.entity.User;
-import com.campnest.backend.entity.Reservation;
 import com.campnest.backend.repository.CampsiteRepository;
 import com.campnest.backend.repository.UserRepository;
-import com.campnest.backend.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,16 +19,7 @@ public class CampsiteServiceImpl implements CampsiteService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
 
-    private void populateBookedStatus(Campsite campsite) {
-        if (campsite == null || campsite.getId() == null) return;
-        List<Reservation> reservations = reservationRepository.findByCampsiteId(campsite.getId());
-        boolean isBooked = reservations.stream()
-                .anyMatch(r -> "PENDING".equals(r.getStatus()) || "CONFIRMED".equals(r.getStatus()));
-        campsite.setBooked(isBooked);
-    }
 
     @Override
     public List<Campsite> getAllCampsites() {
@@ -39,7 +28,6 @@ public class CampsiteServiceImpl implements CampsiteService {
         List<Campsite> filteredCampsites = campsites.stream()
                 .filter(c -> c.getOwner() != null)
                 .collect(java.util.stream.Collectors.toList());
-        filteredCampsites.forEach(this::populateBookedStatus);
         return filteredCampsites;
     }
 
@@ -50,14 +38,12 @@ public class CampsiteServiceImpl implements CampsiteService {
         if (campsite.getOwner() == null) {
             throw new RuntimeException("Campsite not found with id " + id);
         }
-        populateBookedStatus(campsite);
         return campsite;
     }
 
     @Override
     public List<Campsite> getCampsitesByOwnerEmail(String email) {
         List<Campsite> campsites = campsiteRepository.findByOwner_Email(email);
-        campsites.forEach(this::populateBookedStatus);
         return campsites;
     }
 
@@ -124,12 +110,6 @@ public class CampsiteServiceImpl implements CampsiteService {
             if (campsite.getOwner() == null || !campsite.getOwner().getEmail().equals(email)) {
                 throw new RuntimeException("You do not have permission to delete this campsite.");
             }
-        }
-        
-        // Delete all reservations associated with this campsite to avoid foreign key constraint violations
-        List<Reservation> reservations = reservationRepository.findByCampsiteId(id);
-        if (reservations != null && !reservations.isEmpty()) {
-            reservationRepository.deleteAll(reservations);
         }
         
         campsiteRepository.delete(campsite);
