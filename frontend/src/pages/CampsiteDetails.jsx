@@ -156,7 +156,18 @@ export default function CampsiteDetails() {
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8 p-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{camp.name}</h1>
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3 flex-wrap">
+              {camp.name}
+              {camp.ownerType && (
+                <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
+                  camp.ownerType === 'Government' 
+                    ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                    : 'bg-green-100 text-green-800 border border-green-200'
+                }`}>
+                  {camp.ownerType}
+                </span>
+              )}
+            </h1>
             <div className="flex items-center gap-3 mt-2">
               <div className="flex text-yellow-400 text-lg">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -410,7 +421,7 @@ export default function CampsiteDetails() {
                 {camp.websiteUrl && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-semibold">Website:</span>
-                    <a href={formatUrl(camp.websiteUrl)} target="_blank" rel="noopener noreferrer" className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px] flex items-center gap-1">
+                    <a href={formatUrl(camp.websiteUrl)} target="_blank" rel="noopener noreferrer" onClick={handleBookingClick} className="text-[var(--color-nature-green)] font-bold hover:underline truncate max-w-[150px] flex items-center gap-1">
                       🌐 Official Website
                     </a>
                   </div>
