@@ -98,4 +98,6 @@ public class Campsite {
     private String hikingDistance;
     private String hikingTime;
     private String hikingDifficulty;
+
+    private String ownerType;
 }
