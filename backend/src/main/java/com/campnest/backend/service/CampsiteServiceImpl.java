@@ -97,6 +97,7 @@ public class CampsiteServiceImpl implements CampsiteService {
         campsite.setHikingDistance(campsiteDetails.getHikingDistance());
         campsite.setHikingTime(campsiteDetails.getHikingTime());
         campsite.setHikingDifficulty(campsiteDetails.getHikingDifficulty());
+        campsite.setOwnerType(campsiteDetails.getOwnerType());
         
         return campsiteRepository.save(campsite);
     }
