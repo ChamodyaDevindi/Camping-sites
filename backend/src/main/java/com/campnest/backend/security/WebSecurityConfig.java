@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/uploads/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/campsites", "/api/campsites/**").permitAll()
+                    .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/campsites/*/click", "/api/campsites/*/view").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/upload").permitAll()
                     .anyRequest().authenticated()
             );
