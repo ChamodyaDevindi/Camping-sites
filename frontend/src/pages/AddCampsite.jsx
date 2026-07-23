@@ -35,7 +35,8 @@ export default function AddCampsite() {
     externalBooking: false,
     facebookUrl: '',
     instagramUrl: '',
-    websiteUrl: ''
+    websiteUrl: '',
+    ownerType: 'Private'
   });
 
   const [priceDetails, setPriceDetails] = useState([]);
@@ -169,7 +170,7 @@ export default function AddCampsite() {
               <textarea name="description" required rows="4" value={formData.description} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-nature-green)]" placeholder="Overview of the campsite, nearby scenery, environment..."></textarea>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Night (LKR)</label>
                 <input type="number" step="0.01" name="pricePerNight" value={formData.pricePerNight} required onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" placeholder="2500" />
@@ -181,6 +182,13 @@ export default function AddCampsite() {
                   <option value="GLAMPING">Glamping</option>
                   <option value="RV">RV Park</option>
                   <option value="CABIN">Cabin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Owner Type</label>
+                <select name="ownerType" value={formData.ownerType} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg">
+                  <option value="Private">Private</option>
+                  <option value="Government">Government</option>
                 </select>
               </div>
             </div>
