@@ -314,10 +314,22 @@ export default function Campsites() {
                       )}
                     </div>
                     
-                    <p className="text-gray-500 text-xs font-semibold mb-6 flex items-center gap-1">
+                    <p className="text-gray-500 text-xs font-semibold mb-3 flex items-center gap-1">
                       <svg className="w-3.5 h-3.5 text-[var(--color-nature-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                       {camp.location}, {camp.district}
                     </p>
+                    
+                    {camp.ownerType && (
+                      <div className="mb-4">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                          camp.ownerType === 'Government' 
+                            ? 'bg-blue-50 text-blue-700 border border-blue-100' 
+                            : 'bg-green-50 text-green-700 border border-green-100'
+                        }`}>
+                          {camp.ownerType}
+                        </span>
+                      </div>
+                    )}
                     
                     <div className="mt-auto">
                       <Link to={`/campsites/${camp.id}`} className="w-full inline-block text-center bg-[var(--color-nature-green)] hover:bg-[var(--color-nature-light-green)] text-white font-bold py-2 rounded-xl transition-all shadow-sm text-sm">
