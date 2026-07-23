@@ -46,11 +46,11 @@ const uploadImage = (file) => {
 };
 
 const registerClick = (id) => {
-  return axios.post(API_URL + `/${id}/click`);
+  return axios.post(API_URL + `/${id}/click`, {}, { headers: getAuthHeader() });
 };
 
 const registerView = (id) => {
-  return axios.post(API_URL + `/${id}/view`);
+  return axios.post(API_URL + `/${id}/view`, {}, { headers: getAuthHeader() });
 };
 
 const CampsiteService = {
