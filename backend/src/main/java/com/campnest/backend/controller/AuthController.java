@@ -75,7 +75,7 @@ public class AuthController {
             }
         }
 
-        // Create new user's account
+        
         User user = User.builder()
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())
